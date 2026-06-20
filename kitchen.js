@@ -1,13 +1,15 @@
 class KitchenObject {
   constructor(type, x, y) {
-    this.type = type; // "ingredient" or "pot"
+    this.type = type;          // "ingredient" or "pot"
     this.x = x;
     this.y = y;
-    this.progress = 0; // 調理進行度
+    this.progress = 0;         // 調理進行度
+    this.hasIngredient = false; // ← 鍋に食材が入っているか
   }
 
   update() {
-    if (this.type === "pot" && this.progress < 100) {
+    // 鍋に食材が入っている時だけ調理が進む
+    if (this.type === "pot" && this.hasIngredient && this.progress < 100) {
       this.progress += 0.2;
     }
   }
@@ -18,9 +20,15 @@ class KitchenObject {
 
     ctx.fillRect(this.x * cellSize, this.y * cellSize, cellSize, cellSize);
 
+    // 鍋なら進行度を表示
     if (this.type === "pot") {
       ctx.fillStyle = "white";
-      ctx.fillText(Math.floor(this.progress), this.x * cellSize + 10, this.y * cellSize + 20);
+      ctx.font = "16px sans-serif";
+      ctx.fillText(
+        Math.floor(this.progress),
+        this.x * cellSize + 10,
+        this.y * cellSize + 20
+      );
     }
   }
 }
