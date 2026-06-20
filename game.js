@@ -1,9 +1,11 @@
+// ====== Canvas 初期化 ======
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const gridSize = 8;
 const cellSize = 60;
 
+// ====== グリッド・プレイヤー・オブジェクト ======
 const grid = new Grid(gridSize, cellSize);
 const player = new Player(1, 1);
 
@@ -14,6 +16,7 @@ const objects = [
 
 let score = 0;
 
+// ====== キー入力 ======
 document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowUp") player.move(0, -1, gridSize);
   if (e.key === "ArrowDown") player.move(0, 1, gridSize);
@@ -23,24 +26,34 @@ document.addEventListener("keydown", (e) => {
   if (e.key === " ") interact();
 });
 
+// ====== インタラクト処理 ======
 function interact() {
   for (let obj of objects) {
     if (obj.x === player.x && obj.y === player.y) {
+
+      // --- 食材を拾う ---
       if (obj.type === "ingredient" && !player.holding) {
         player.holding = "ingredient";
       }
+
+      // --- 食材を鍋に入れる ---
       if (obj.type === "pot" && player.holding === "ingredient") {
-        obj.progress = 0;
+        obj.hasIngredient = true;  // ← 鍋に食材が入った
+        obj.progress = 0;          // 調理開始
         player.holding = null;
       }
+
+      // --- 調理完了（100%） ---
       if (obj.type === "pot" && obj.progress >= 100) {
         score++;
         obj.progress = 0;
+        obj.hasIngredient = false; // 鍋を空に戻す
       }
     }
   }
 }
 
+// ====== メインループ ======
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -54,6 +67,7 @@ function loop() {
   player.draw(ctx, cellSize);
 
   ctx.fillStyle = "white";
+  ctx.font = "18px sans-serif";
   ctx.fillText("Score: " + score, 10, 20);
 
   requestAnimationFrame(loop);
